@@ -55,6 +55,9 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     override func viewDidLoad() {
         self.signedInStatus(isSignedIn: true)
         
+        // call configureDatabase here since it never seems to be called
+        configureDatabase()
+        
         // TODO: Handle what users see when view loads
     }
     
@@ -121,7 +124,12 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     // MARK: Send Message
     
     func sendMessage(data: [String:String]) {
-        // TODO: create method that pushes message to the firebase database
+        // make a copy of the message struct
+        var mdata = data
+        // add display name to text of message
+        mdata[Constants.MessageFields.name] = displayName
+        // write the message to the database
+        ref.child("message").childByAutoId().setValue(mdata)
     }
     
     func sendPhotoMessage(photoData: Data) {
