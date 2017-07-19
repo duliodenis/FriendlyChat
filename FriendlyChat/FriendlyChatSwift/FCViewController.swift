@@ -74,6 +74,14 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     
     func configureDatabase() {
         ref = Database.database().reference()
+        
+        // configure a listener to messages
+        _refHandle = ref.child("messages").observe(.childAdded, with: { (snapshot) in
+            self.messages.append(snapshot)
+            
+            self.messagesTable.insertRows(at: [IndexPath(row: self.messages.count - 1, section: 0)], with: .automatic)
+            self.scrollToBottomMessage()
+        })
     }
     
     func configureStorage() {
@@ -81,7 +89,8 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     deinit {
-        // TODO: set up what needs to be deinitialized when view is no longer being used
+        // remove the messages observer when the VC goes off screen
+        ref.child("messages").removeObserver(withHandle: _refHandle)
     }
     
     // MARK: Remote Config
