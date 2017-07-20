@@ -58,6 +58,11 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
         // call configureDatabase here since it never seems to be called
         configureDatabase()
         
+        /*
+        messagesTable.delegate = self
+        messagesTable.dataSource = self
+        */
+ 
         // TODO: Handle what users see when view loads
     }
     
@@ -218,8 +223,18 @@ extension FCViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // dequeue cell
         let cell: UITableViewCell! = messagesTable.dequeueReusableCell(withIdentifier: "messageCell", for: indexPath)
+        
+        // unpack message from firebase data snapshot
+        let messageSnapshot: DataSnapshot! = messages[indexPath.row]
+        let message = messageSnapshot.value as! [String:String]
+        
+        let name = message[Constants.MessageFields.name] ?? "[username]"
+        let text = message[Constants.MessageFields.text] ?? "[message]"
+        
+        cell!.textLabel?.text = name + ": " + text
+        cell!.imageView?.image = self.placeholderImage
+        
         return cell!
-        // TODO: update cell to display message data
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
