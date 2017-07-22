@@ -1,7 +1,7 @@
 # FriendlyChat
 This repository contains my code for the FriendlyChat project in the ['Firebase in a Weekend'](https://www.udacity.com/course/firebase-in-a-weekend-by-google-ios--ud0351) Udacity course (ud0351).
 
-![](art/screenshot/friendlychat-00.gif?raw=true)
+![](art/screenshot/friendlychat-01.gif?raw=true)
 
 FriendlyChat is an app that allows users to send and receive text and photos in realtime across platforms.
 

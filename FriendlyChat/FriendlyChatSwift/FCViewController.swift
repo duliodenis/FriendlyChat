@@ -53,7 +53,8 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     // MARK: Life Cycle
     
     override func viewDidLoad() {
-        self.signedInStatus(isSignedIn: true)
+        // self.signedInStatus(isSignedIn: true)
+        configureAuth()
         
         // call configureDatabase here since it never seems to be called
         configureDatabase()
@@ -74,7 +75,27 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     // MARK: Config
     
     func configureAuth() {
-        // TODO: configure firebase authentication
+        // listen for changes in the authorization state
+        _authHandle = Auth.auth().addStateDidChangeListener({ (auth, user) in
+            // refresh table data
+            self.messages.removeAll(keepingCapacity: false)
+            self.messagesTable.reloadData()
+            
+            // check if there is a current user
+            if let activeUser = user {
+                // check if the current app user is the current Firebase user
+                if self.user != activeUser {
+                    self.user = activeUser
+                    self.signedInStatus(isSignedIn: true)
+                    let name = user!.email!.components(separatedBy: "@")[0]
+                    self.displayName = name
+                }
+            } else {
+                // user must sign in
+                self.signedInStatus(isSignedIn: false)
+                self.loginSession()
+            }
+        })
     }
     
     func configureDatabase() {
@@ -96,6 +117,9 @@ class FCViewController: UIViewController, UINavigationControllerDelegate {
     deinit {
         // remove the messages observer when the VC goes off screen
         ref.child("messages").removeObserver(withHandle: _refHandle)
+        
+        // remove the authentication state listener
+        Auth.auth().removeStateDidChangeListener(_authHandle)
     }
     
     // MARK: Remote Config
